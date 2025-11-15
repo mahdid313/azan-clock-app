@@ -1406,35 +1406,8 @@
         }
         
         function updateTomorrowTimes() {
-            const now = new Date();
-            const todayStr = formatDate(now);
-            const todayData = prayerData.find(d => d.date === todayStr);
-            
-            if (!todayData) return;
-            
-            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            const currentMinutes = timeToMinutes(currentTime);
-            const maghribAdjusted = adjustTimeForDST(todayData.maghrib, now);
-            const maghribMinutes = timeToMinutes(maghribAdjusted);
-            
-            if (currentMinutes >= maghribMinutes) {
-                const tomorrow = new Date(now);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const tomorrowStr = formatDate(tomorrow);
-                const tomorrowData = prayerData.find(d => d.date === tomorrowStr);
-                
-                if (tomorrowData) {
-                    const fajrAdjusted = adjustTimeForDST(tomorrowData.fajr, tomorrow);
-                    const zohrAdjusted = adjustTimeForDST(tomorrowData.zohr, tomorrow);
-                    const maghribAdjusted = adjustTimeForDST(tomorrowData.maghrib, tomorrow);
-                    
-                    document.getElementById('tomorrow-times').innerHTML = `
-                        📅 Tomorrow: Fajr ${fajrAdjusted} | Zohr ${zohrAdjusted} | Maghrib ${maghribAdjusted}
-                    `;
-                }
-            } else {
-                document.getElementById('tomorrow-times').innerHTML = '';
-            }
+            // Tomorrow times removed - prayer cards now show next day after maghrib
+            document.getElementById('tomorrow-times').innerHTML = '';
         }
         
         function loadCSV() {
@@ -3171,22 +3144,46 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
         function updateDisplay() {
             const now = new Date();
             const todayStr = formatDate(now);
-            
+
             // If prayerData is empty, data hasn't loaded yet - just return silently
             if (prayerData.length === 0) {
                 console.log('Prayer data not loaded yet, waiting...');
                 return;
             }
-            
+
             console.log('Looking for date:', todayStr, 'in', prayerData.length, 'entries');
             if (prayerData.length > 0) {
                 console.log('First entry:', prayerData[0].date, 'Last entry:', prayerData[prayerData.length - 1].date);
             }
             const todayData = prayerData.find(d => d.date === todayStr);
-            
+
             if (todayData) {
                 console.log('Found data for today:', todayData);
-                displayPrayerTimes(todayData, now);
+
+                // Check if maghrib has passed - if so, show tomorrow's times
+                const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                const currentMinutes = timeToMinutes(currentTime);
+                const maghribAdjusted = adjustTimeForDST(todayData.maghrib, now);
+                const maghribMinutes = timeToMinutes(maghribAdjusted);
+
+                if (currentMinutes >= maghribMinutes) {
+                    // Maghrib has passed, show tomorrow's prayer times
+                    const tomorrow = new Date(now);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const tomorrowStr = formatDate(tomorrow);
+                    const tomorrowData = prayerData.find(d => d.date === tomorrowStr);
+
+                    if (tomorrowData) {
+                        console.log('Maghrib passed, showing tomorrow\'s times:', tomorrowData);
+                        displayPrayerTimes(tomorrowData, tomorrow);
+                    } else {
+                        // Fall back to today's data if tomorrow not found
+                        displayPrayerTimes(todayData, now);
+                    }
+                } else {
+                    // Before maghrib, show today's times
+                    displayPrayerTimes(todayData, now);
+                }
             } else {
                 console.error('No match for', todayStr, 'in prayer data');
                 showError(`No prayer times found for today (${todayStr})`);
@@ -3324,8 +3321,12 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
                     const eventId = `${dayOfWeek}-${eventIndex}-${targetTime}`;
                     if (currentMinutes === targetTime && !duasTriggered.includes(eventId)) {
                         duasTriggered.push(eventId);
-                        
-                        if (currentTime === todayData.fajr || currentTime === todayData.zohr || currentTime === todayData.maghrib) {
+
+                        // Don't interrupt azan with dua
+                        if (currentAudio && !currentlyPlayingDua) {
+                            // Azan is playing, queue the dua instead
+                            queueAudio(`Duas/${event.audio}`, event.audio, settings.volumeDuas / 100, true);
+                        } else if (currentTime === todayData.fajr || currentTime === todayData.zohr || currentTime === todayData.maghrib) {
                             queueAudio(`Duas/${event.audio}`, event.audio, settings.volumeDuas / 100, true);
                         } else {
                             // If this is the first dua at this time, play it. Otherwise queue it.
@@ -3343,7 +3344,7 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
             
             if (!isPrayerTime && !isDuaTime) {
                 if (!settings.tasbeehEnabled) return;
-                if (currentlyPlayingDua) return; // Don't interrupt duas with tasbeeh
+                if (currentAudio) return; // Don't interrupt azan or duas with tasbeeh
                 
                 const [startHour, startMin] = settings.tasbeehStart.split(':').map(Number);
                 const [endHour, endMin] = settings.tasbeehEnd.split(':').map(Number);
