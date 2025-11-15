@@ -1,0 +1,74 @@
+# Audio Filenames Reference
+# Copy this list to verify your audio files are named correctly
+
+# ====================================
+# AZAN FOLDER (5 files)
+# Location: www/Azan/
+# ====================================
+Kadhmain.mp3
+Karbala.mp3
+Mashhad.mp3
+Najaf.mp3
+Qom.mp3
+
+# ====================================
+# DUAS FOLDER (26 files)
+# Location: www/Duas/
+# ====================================
+dua-ahad.mp3
+Dua for Friday.mp3
+Dua for Monday.mp3
+Dua for Saturday.mp3
+Dua for Sunday.mp3
+Dua for Thursday.mp3
+Dua for Tuesday.mp3
+Dua for Wednesday.mp3
+Dua_Faraj.mp3
+Dua_Iftitah.mp3
+dua_kumayl.mp3
+dua_mashlool.mp3
+dua_mujeer.mp3
+Dua_Nudba.mp3
+dua_sabah.mp3
+dua_samaat.mp3
+dua_tawassul.mp3
+dua_yastasheer.mp3
+Juz 30.mp3
+Surah Mulk.mp3
+Surah Rahman.mp3
+Surah Waqiah.mp3
+Surah Yaseen.mp3
+Tasbihaat alAshar.mp3
+Ziyarat Jamia Kabeer.mp3
+Ziyarat_Ashura.mp3
+
+# ====================================
+# TASBEEH FOLDER (4 files)
+# Location: www/Tasbeeh/
+# ====================================
+Alhamdulillah.mp3
+Salawat.mp3
+Subhanallah.mp3
+Takbeer.mp3
+
+# ====================================
+# TOTAL: 35 audio files
+# ====================================
+
+# IMPORTANT NOTES:
+# 1. Filenames are CASE-SENSITIVE!
+# 2. Must include spaces where shown (e.g., "Dua for Friday.mp3")
+# 3. Mix of underscores and spaces (e.g., "dua_kumayl.mp3" vs "Dua for Monday.mp3")
+# 4. All files must be MP3 format
+# 5. Verify each file plays correctly before building
+
+# VERIFICATION COMMANDS:
+# Linux/Mac:
+#   cd www/Azan && ls -1 | sort
+#   cd www/Duas && ls -1 | sort
+#   cd www/Tasbeeh && ls -1 | sort
+
+# Windows:
+#   cd www\Azan && dir /b
+#   cd www\Duas && dir /b
+#   cd www\Tasbeeh && dir /b

@@ -1,0 +1,85 @@
+# Audio Files to Replace
+
+This app uses 35 audio files. Currently, all are tiny placeholder MP3s (124 bytes each).
+You need to replace them with your real audio recordings.
+
+IMPORTANT: Keep the exact same filenames when replacing!
+
+---
+
+## Azan Folder (5 files)
+
+Location: src/Azan/
+
+1. Kadhmain.mp3
+2. Karbala.mp3
+3. Mashhad.mp3
+4. Najaf.mp3
+5. Qom.mp3
+
+---
+
+## Duas Folder (26 files)
+
+Location: src/Duas/
+
+1. dua-ahad.mp3
+2. Dua for Friday.mp3
+3. Dua for Monday.mp3
+4. Dua for Saturday.mp3
+5. Dua for Sunday.mp3
+6. Dua for Thursday.mp3
+7. Dua for Tuesday.mp3
+8. Dua for Wednesday.mp3
+9. Dua_Faraj.mp3
+10. Dua_Iftitah.mp3
+11. dua_kumayl.mp3
+12. dua_mashlool.mp3
+13. dua_mujeer.mp3
+14. Dua_Nudba.mp3
+15. dua_sabah.mp3
+16. dua_samaat.mp3
+17. dua_tawassul.mp3
+18. dua_yastasheer.mp3
+19. Juz 30.mp3
+20. Surah Mulk.mp3
+21. Surah Rahman.mp3
+22. Surah Waqiah.mp3
+23. Surah Yaseen.mp3
+24. Tasbihaat alAshar.mp3
+25. Ziyarat Jamia Kabeer.mp3
+26. Ziyarat_Ashura.mp3
+
+---
+
+## Tasbeeh Folder (4 files)
+
+Location: src/Tasbeeh/
+
+1. Alhamdulillah.mp3
+2. Salawat.mp3
+3. Subhanallah.mp3
+4. Takbeer.mp3
+
+---
+
+## How to Replace
+
+1. Keep your original audio files organized in matching folders
+2. Ensure filenames match exactly (case-sensitive!)
+3. Recommended format: MP3, 128kbps
+4. Copy your files to replace the placeholders
+5. Rebuild APK: npm run build
+
+---
+
+## File Size Expectations
+
+- With placeholders: ~8MB APK
+- With real audio (128kbps): ~50-100MB APK
+- With high quality (320kbps): ~100-150MB APK
+
+Lower bitrate = smaller APK = faster downloads for users
+Higher bitrate = better quality = larger APK
+
+Recommended: 128kbps MP3 for good balance

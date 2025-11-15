@@ -1,0 +1,14 @@
+{
+  "version": "1.0.1",
+  "message": "Added new prayer timings for Birmingham and Manchester",
+  "timings": [
+    {
+      "name": "Birmingham_2025.csv",
+      "url": "https://raw.githubusercontent.com/YOUR_USERNAME/azan-clock-updates/main/Timing/Birmingham_2025.csv"
+    },
+    {
+      "name": "Manchester_2025.csv",
+      "url": "https://raw.githubusercontent.com/YOUR_USERNAME/azan-clock-updates/main/Timing/Manchester_2025.csv"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "azan-clock-app",
+  "version": "1.0.0",
+  "description": "Transform your old Android phone into a dedicated 24/7 prayer time display with automatic azan playback, scheduled duas, and periodic tasbeeh reminders.",
+  "main": "index.js",
+  "scripts": {
+    "sync": "npx cap sync",
+    "build": "npx cap sync && cd android && ./gradlew assembleDebug && cd .. && echo 'APK built at: android/app/build/outputs/apk/debug/app-debug.apk'",
+    "build-release": "npx cap sync && cd android && ./gradlew assembleRelease && cd .. && echo 'APK built at: android/app/build/outputs/apk/release/app-release-unsigned.apk'",
+    "open-android": "npx cap open android"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor-community/keep-awake": "^7.1.0",
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/screen-orientation": "^7.0.2"
+  }
+}
