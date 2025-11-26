@@ -3175,14 +3175,15 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
 
                     if (tomorrowData) {
                         console.log('Maghrib passed, showing tomorrow\'s times:', tomorrowData);
-                        displayPrayerTimes(tomorrowData, tomorrow);
+                        // Pass tomorrow's data but use tomorrow's date for DST, and disable highlighting
+                        displayPrayerTimes(tomorrowData, tomorrow, false);
                     } else {
                         // Fall back to today's data if tomorrow not found
-                        displayPrayerTimes(todayData, now);
+                        displayPrayerTimes(todayData, now, true);
                     }
                 } else {
                     // Before maghrib, show today's times
-                    displayPrayerTimes(todayData, now);
+                    displayPrayerTimes(todayData, now, true);
                 }
             } else {
                 console.error('No match for', todayStr, 'in prayer data');
@@ -3190,9 +3191,9 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
             }
         }
         
-        function displayPrayerTimes(data, now) {
+        function displayPrayerTimes(data, now, enableHighlighting = true) {
             const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
+
             // Adjust times for DST if needed
             const imsaakDisplay = data.imsaak ? adjustTimeForDST(data.imsaak, now) : null;
             const fajrDisplay = adjustTimeForDST(data.fajr, now);
@@ -3201,7 +3202,7 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
             const sunsetDisplay = data.sunset ? adjustTimeForDST(data.sunset, now) : null;
             const maghribDisplay = adjustTimeForDST(data.maghrib, now);
             const tomorrowFajrDisplay = data.tomorrowFajr ? adjustTimeForDST(data.tomorrowFajr, now) : null;
-            
+
             const prayers = [
                 {name: 'Imsaak', time: imsaakDisplay, show: settings.showImsaak && imsaakDisplay},
                 {name: 'Fajr', time: fajrDisplay, show: true},
@@ -3211,24 +3212,25 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
                 {name: 'Maghrib', time: maghribDisplay, show: true},
                 {name: 'Tomorrow Fajr', time: tomorrowFajrDisplay, show: settings.showTomorrowFajr && tomorrowFajrDisplay}
             ];
-            
+
             let html = '';
             prayers.forEach((prayer, index) => {
                 if (!prayer.show) return;
-                
+
                 let className = 'prayer-card';
                 const prayerMinutes = timeToMinutes(prayer.time);
                 const currentMinutes = timeToMinutes(currentTime);
-                
+
                 // Only highlight actual prayer times (not Imsaak, Sunset, Tomorrow Fajr)
-                if (!['Imsaak', 'Sunset', 'Tomorrow Fajr'].includes(prayer.name)) {
+                // And only if highlighting is enabled (disabled when showing tomorrow's prayers)
+                if (enableHighlighting && !['Imsaak', 'Sunset', 'Tomorrow Fajr'].includes(prayer.name)) {
                     if (Math.abs(prayerMinutes - currentMinutes) <= 5) {
                         className += ' active';
                     } else if (prayerMinutes > currentMinutes && prayerMinutes - currentMinutes <= 30) {
                         className += ' upcoming';
                     }
                 }
-                
+
                 html += `
                     <div class="${className}">
                         <div class="prayer-name">${prayer.name}</div>
@@ -3236,7 +3238,7 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
                     </div>
                 `;
             });
-            
+
             document.getElementById('prayer-times').innerHTML = html;
         }
         
@@ -3266,21 +3268,21 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
                 const fajrAdjusted = adjustTimeForDST(todayData.fajr, now);
                 const zohrAdjusted = adjustTimeForDST(todayData.zohr, now);
                 const maghribAdjusted = adjustTimeForDST(todayData.maghrib, now);
-                
+
                 if (currentTime === fajrAdjusted) {
                     playAudio(`Azan/${settings.azanAudio}`, 'Fajr Azan', settings.volumeAzan / 100, false);
                     lastPlayedEvent = eventKey;
-                    return;
+                    isPrayerTime = true;
                 }
                 if (currentTime === zohrAdjusted) {
                     playAudio(`Azan/${settings.azanAudio}`, 'Zohr Azan', settings.volumeAzan / 100, false);
                     lastPlayedEvent = eventKey;
-                    return;
+                    isPrayerTime = true;
                 }
                 if (currentTime === maghribAdjusted) {
                     playAudio(`Azan/${settings.azanAudio}`, 'Maghrib Azan', settings.volumeAzan / 100, false);
                     lastPlayedEvent = eventKey;
-                    return;
+                    isPrayerTime = true;
                 }
             }
             
@@ -3322,11 +3324,8 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
                     if (currentMinutes === targetTime && !duasTriggered.includes(eventId)) {
                         duasTriggered.push(eventId);
 
-                        // Don't interrupt azan with dua
-                        if (currentAudio && !currentlyPlayingDua) {
-                            // Azan is playing, queue the dua instead
-                            queueAudio(`Duas/${event.audio}`, event.audio, settings.volumeDuas / 100, true);
-                        } else if (currentTime === todayData.fajr || currentTime === todayData.zohr || currentTime === todayData.maghrib) {
+                        // If azan is playing or this is prayer time, queue the dua
+                        if (isPrayerTime || (currentAudio && !currentlyPlayingDua)) {
                             queueAudio(`Duas/${event.audio}`, event.audio, settings.volumeDuas / 100, true);
                         } else {
                             // If this is the first dua at this time, play it. Otherwise queue it.
@@ -3336,7 +3335,6 @@ Peterborough,12,31,06:31:00,06:41:00,08:12:00,12:09:00,15:56:00,16:11:00,06:40:0
                                 queueAudio(`Duas/${event.audio}`, event.audio, settings.volumeDuas / 100, true);
                             }
                         }
-                        lastPlayedEvent = eventKey;
                         isDuaTime = true;
                     }
                 });
