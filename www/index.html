@@ -673,14 +673,6 @@
                         <button class="remove-btn" onclick="stopTestAudio()" id="stop-azan-btn" style="display: none;">⏹️ Stop</button>
                     </div>
                 </div>
-                
-                <div class="setting-group">
-                    <label>📤 Upload Custom CSV File</label>
-                    <input type="file" id="upload-csv" accept=".csv" style="display: none;" onchange="handleCSVUpload(event)">
-                    <button class="add-btn" onclick="document.getElementById('upload-csv').click()">+ Upload CSV</button>
-                </div>
-                
-                <button class="refresh-btn" onclick="reloadPrayerTimes()">🔄 Reload Prayer Times</button>
             </div>
             
             <div id="dua-tab" class="tab-content">
@@ -889,12 +881,6 @@
                 });
                 tasbeehSelect.value = settings.tasbeehAudio;
             }
-        }
-        
-        function reloadPrayerTimes() {
-            loadCSV();
-            showError('Prayer times reloaded successfully!', false);
-            setTimeout(() => hideError(), 2000);
         }
         
         function scanFolders() {
@@ -1300,28 +1286,6 @@
         
         function hideError() {
             document.getElementById('error-message').classList.remove('show');
-        }
-        
-        function handleCSVUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const content = e.target.result;
-                    const fileName = file.name;
-                    const displayName = fileName.replace('.csv', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                    
-                    localStorage.setItem(`csv_${fileName}`, content);
-                    
-                    customFiles.timing.push({file: fileName, name: displayName});
-                    saveCustomFiles();
-                    populateFileDropdowns();
-                    
-                    showError(`✓ CSV "${displayName}" uploaded successfully!`, false);
-                    setTimeout(() => hideError(), 3000);
-                };
-                reader.readAsText(file);
-            }
         }
         
         function toggleMute() {
